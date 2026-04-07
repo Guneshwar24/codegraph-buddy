@@ -76,3 +76,14 @@ export interface AllGraphs {
   repos: RepoGraph[];
   crossRepo: CrossRepoGraph;
 }
+
+// Config file schema (codegraph.config.json)
+export interface RepoConfig {
+  name: string;   // short identifier e.g. "agent-backend"
+  path: string;   // path relative to config file, or absolute
+}
+
+export interface CodeGraphConfig {
+  repos: RepoConfig[];
+  output?: string;  // output dir, defaults to ".codegraph" next to config file
+}

@@ -1,0 +1,8 @@
+{
+  "repos": [
+    { "name": "backend",  "path": "../my-backend" },
+    { "name": "frontend", "path": "../my-frontend" },
+    { "name": "shared",   "path": "../my-shared-lib" }
+  ],
+  "output": ".codegraph"
+}
