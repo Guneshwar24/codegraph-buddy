@@ -5,7 +5,7 @@ import type { GraphLoader } from './loader.js';
 
 export function registerTools(server: McpServer, loader: GraphLoader): void {
   // Tool 1: shake
-  server.tool('shake', 'High-level overview of all three bidbuddy repos. Start here before any other tool.', {}, async () => {
+  server.tool('shake', 'High-level overview of all indexed repos. Start here before any other tool.', {}, async () => {
     const graphs = loader.getGraphs();
     const result = graphs.map(g => ({
       repo: g.repo,
@@ -29,7 +29,7 @@ export function registerTools(server: McpServer, loader: GraphLoader): void {
   });
 
   // Tool 2: architecture_map
-  server.tool('architecture_map', 'Cross-repo dependency graph showing how the three bidbuddy repos connect via HTTP calls and imports.', {}, async () => {
+  server.tool('architecture_map', 'Cross-repo dependency graph showing how all indexed repos connect via HTTP calls and imports.', {}, async () => {
     const crossRepo = loader.getCrossRepo();
     const graphs = loader.getGraphs();
     // Collapse to package level: group edges by from-repo → to-repo
@@ -59,7 +59,7 @@ export function registerTools(server: McpServer, loader: GraphLoader): void {
   server.tool(
     'repo_summary',
     'Detailed summary of one repo: all routes, agents, classes, and key functions.',
-    { repo: z.enum(['agent-backend', 'markethub-backend', 'frontend-next']).describe('Which repo to summarize') },
+    { repo: z.string().describe('Which repo to summarize — use the repo name from shake (e.g. "agent-backend", "frontend-next")') },
     async ({ repo }) => {
       const graph = loader.getGraphs().find(g => g.repo === repo);
       if (!graph) return { content: [{ type: 'text' as const, text: `Repo not found: ${repo}` }], isError: true };
@@ -101,14 +101,13 @@ export function registerTools(server: McpServer, loader: GraphLoader): void {
     'Trace a URL path through the full stack: frontend fetch → API route → agent → downstream services.',
     { path: z.string().describe('URL path to trace, e.g. "/api/agents/run"') },
     async ({ path: urlPath }) => {
-      // Find frontend nodes that call this path
-      const frontendCalls: Array<{ nodeId: string; file: string }> = [];
+      // Find all nodes that call this path (across any repo)
+      const frontendCalls: Array<{ nodeId: string; file: string; repo: string }> = [];
       for (const graph of loader.getGraphs()) {
-        if (graph.repo !== 'frontend-next') continue;
         for (const edge of graph.edges) {
           if (edge.kind === 'http_calls' && edge.to.includes(urlPath)) {
             const fromNode = loader.nodeById(edge.from);
-            frontendCalls.push({ nodeId: edge.from, file: fromNode?.file ?? edge.from });
+            frontendCalls.push({ nodeId: edge.from, file: fromNode?.file ?? edge.from, repo: graph.repo });
           }
         }
       }
@@ -156,7 +155,7 @@ export function registerTools(server: McpServer, loader: GraphLoader): void {
     {
       query: z.string().describe('Search term (case-insensitive substring match on symbol names and file paths)'),
       kind: z.enum(['function', 'class', 'method', 'type', 'interface', 'route', 'agent', 'agent_node', 'file', 'package']).optional().describe('Filter by node kind'),
-      repo: z.enum(['agent-backend', 'markethub-backend', 'frontend-next']).optional().describe('Filter by repo'),
+      repo: z.string().optional().describe('Filter by repo name — use a name from shake output'),
     },
     async ({ query, kind, repo }) => {
       const nodes = loader.search(query, kind as any, repo).slice(0, 30);

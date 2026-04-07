@@ -23,11 +23,11 @@ export type EdgeKind =
 
 // A single entity extracted from the codebase
 export interface GraphNode {
-  id: string;         // "{repo}::{file}::{name}" e.g. "agent-backend::agents/rag_agent.py::RagAgent"
+  id: string;         // "{repo}::{file}::{name}" e.g. "my-backend::src/api/routes.py::get_user"
   kind: NodeKind;
   name: string;
   file: string;       // relative path within repo
-  repo: string;       // "agent-backend" | "markethub-backend" | "frontend-next"
+  repo: string;       // repo name as defined in codegraph.config.json
   startLine: number;
   endLine: number;
   meta?: {

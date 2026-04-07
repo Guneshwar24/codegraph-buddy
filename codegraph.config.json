@@ -1,8 +1,0 @@
-{
-  "repos": [
-    { "name": "agent-backend",     "path": "../bidbuddy-agent-backend" },
-    { "name": "markethub-backend", "path": "../bidbuddy-markethub-backend" },
-    { "name": "frontend-next",     "path": "../bidbuddy-frontend-next" }
-  ],
-  "output": ".codegraph"
-}
