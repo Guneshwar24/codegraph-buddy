@@ -222,6 +222,32 @@ node dist/cli.js build   # ~10s for 800 files
 # Open Claude Code → tools auto-connect
 ```
 
+### The Skill: Teaching Claude How to Use the Tools
+
+Having the MCP tools available is only half the picture. The other half is making sure Claude uses them in the right order.
+
+**Without the skill:** Claude knows the 8 codegraph tools exist, but decides on its own whether to use them, when, and in what order. It might skip `shake` and jump straight to reading files out of habit — which burns tokens.
+
+**With the skill:** Claude follows an explicit playbook every session — always starting broad, drilling narrow, and never touching a file until the graph can't answer the question.
+
+| Rule | Why it matters |
+|---|---|
+| Always call `shake` first | Orients Claude in ~300 tokens before anything else |
+| Follow the 8-step depth ladder | Broad → narrow, stops as soon as it has enough |
+| Never use `Grep` to find symbols | Use `search` instead — structured, cheaper |
+| Never read an agent `.py` file without `list_agents` first | The graph already has the full topology |
+| `get_source` is last resort only | Actual file reading is the most expensive thing |
+
+**Install the skill** by saving `SKILL.md` to `~/.claude/skills/codegraph-buddy/SKILL.md`:
+
+```bash
+mkdir -p ~/.claude/skills/codegraph-buddy
+curl -o ~/.claude/skills/codegraph-buddy/SKILL.md \
+  https://raw.githubusercontent.com/Guneshwar24/codegraph-buddy/main/skill/SKILL.md
+```
+
+The skill auto-activates whenever you're working in a multi-repo codebase. You can also invoke it explicitly with `/codegraph-buddy` in any Claude Code session.
+
 ---
 
 ## Real-World Numbers
