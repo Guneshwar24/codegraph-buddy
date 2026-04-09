@@ -21,11 +21,13 @@ Vector search tools (Greptile, Sourcegraph Cody, Cursor's indexing) are better, 
 ```
 Ask: "How does the RAG agent work?"
 
-Without codegraph:  Read 20+ files → 10,000 tokens → maybe get the answer
-With codegraph:     list_agents → get_symbol → get_source → 800 tokens → precise answer
+Without codegraph:  Read 20+ files → many thousands of tokens → maybe get the answer
+With codegraph:     list_agents → get_symbol → get_source → structured answer
 ```
 
-The result: **40–95% token reduction** on codebase comprehension tasks. Same answer quality. No cloud. No embeddings. No latency from inference steps. Just structure.
+No cloud. No embeddings. No latency from inference steps. Just structure.
+
+> **Benchmark it yourself.** In practice I found token usage dropped significantly — anywhere from 40% to 65% depending on task complexity and how many repos are involved. Your mileage will vary. Run your own sessions with and without and see.
 
 ---
 
@@ -39,7 +41,7 @@ The result: **40–95% token reduction** on codebase comprehension tasks. Same a
 | **Cloud required** | Yes (for embedding model) | No |
 | **Cross-repo linking** | Not typically | Yes — HTTP + import edges |
 | **LangGraph aware** | No | Yes — agent topology extracted |
-| **Token cost** | High (retrieves chunks) | Low (returns structured metadata) |
+| **Token cost** | High (retrieves chunks) | Lower (returns structured metadata) |
 
 ---
 
@@ -270,17 +272,15 @@ Example run on a 3-repo multi-agent codebase (Python API backend + Python data p
 
 ## How it Compares
 
-| Tool | Approach | Cloud | Cross-repo | LangGraph | Token savings |
-|---|---|---|---|---|---|
-| **codegraph-buddy** | AST graph | No | Yes | Yes | 40–95% |
-| Greptile | Embeddings | Yes | Partial | No | ~30% |
-| Sourcegraph Cody | Embeddings + search | Yes | Yes | No | ~40% |
-| Cursor indexing | Embeddings | Yes | No | No | ~30% |
-| Codebase-Memory MCP | AST + SQLite (C binary) | No | No | No | 99%* |
-| mcp-server-tree-sitter | AST (in-memory) | No | No | No | varies |
-| Repomix | File packing | No | Manual | No | 0% (dumps everything) |
-
-*Codebase-Memory achieves higher savings on generic repos; codegraph-buddy adds LangGraph awareness and cross-repo linking specific to multi-agent architectures.
+| Tool | Approach | Cloud | Cross-repo | LangGraph |
+|---|---|---|---|---|
+| **codegraph-buddy** | AST graph | No | Yes | Yes |
+| Greptile | Embeddings | Yes | Partial | No |
+| Sourcegraph Cody | Embeddings + search | Yes | Yes | No |
+| Cursor indexing | Embeddings | Yes | No | No |
+| Codebase-Memory MCP | AST + SQLite (C binary) | No | No | No |
+| mcp-server-tree-sitter | AST (in-memory) | No | No | No |
+| Repomix | File packing | No | Manual | No |
 
 ---
 
