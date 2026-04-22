@@ -1,0 +1,17 @@
+{
+  "watch": [
+    "../frontend",
+    "../backend"
+  ],
+  "ext": "py,ts,tsx,js,jsx",
+  "ignore": [
+    "**/node_modules/**",
+    "**/.next/**",
+    "**/__pycache__/**",
+    "**/.codegraph/**",
+    "**/dist/**",
+    "**/.git/**"
+  ],
+  "exec": "node dist/cli.js build",
+  "delay": 3000
+}
